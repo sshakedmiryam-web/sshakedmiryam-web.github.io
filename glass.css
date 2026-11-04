@@ -49,3 +49,15 @@ body{background:radial-gradient(ellipse at 15% 35%,#e8e0da80,transparent 45%),va
 .case-story{background:linear-gradient(130deg,#ffffff38,#ffffff0a);border-color:#ffffffd9;outline:1px solid #ffffff55;outline-offset:-5px;box-shadow:inset 1px 1px 2px #ffffffef,inset -1px -1px 2px #ffffffab,0 18px 35px #5900180b;backdrop-filter:blur(14px) saturate(1.25)}
 .exhibition-hint{font-size:12px}
 @media(max-width:700px){.projects-grid .project-info{padding-top:10px}.exhibition-hint{font-size:11px}.gallery-item figcaption small{font-size:10px}}
+
+/* Mobile touch particles: keep the spark layer visible while hiding only the mouse cursor. */
+@media (max-width:700px), (hover:none) {
+ #cursor-stars { display:block; position:fixed; inset:0; pointer-events:none; z-index:100; overflow:visible; }
+ #cursor-stars .cursor-spark { display:block; }
+}
+/* Keep arrow glyphs typographic, not colored emoji, on mobile browsers. */
+.round-arrow,.next-arrow,.next-project .next-arrow,.exhibition-controls button,.gallery-controls button,.round-link .round-arrow,.back-link span,.header-link span,.hero-bottom a span,.closing a span,footer a,.code-back {
+ font-family:Arial,Helvetica,sans-serif;
+ font-variant-emoji:text;
+}
+#cursor-stars .cursor-spark.code-spark {clip-path:none;background:none;box-shadow:none;filter:none;width:auto;height:auto;min-width:24px;color:#f7f1e8;text-shadow:0 1px 5px #590018aa;font:700 var(--spark-size,14px)/1.2 monospace;white-space:nowrap;direction:ltr;}
