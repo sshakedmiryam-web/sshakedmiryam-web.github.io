@@ -145,28 +145,29 @@
   const coding=document.body.dataset.area==='code';star.classList.toggle('code-spark',coding);star.textContent=coding?['</>','{ }','=>','();','[ ]','&&'][starIndex%6]:'';const size=12+(starIndex%4)*5,dx=Math.sin(starIndex*2.4)*23,dy=Math.cos(starIndex*1.8)*19;
   star.style.setProperty('--spark-size',size+'px');star.animate([{transform:`translate(${tx+dx}px,${ty+dy}px) rotate(0deg) scale(.4)`,opacity:0},{transform:`translate(${tx+dx}px,${ty+dy-4}px) rotate(15deg) scale(1)`,opacity:.85,offset:.22},{transform:`translate(${tx+dx*.65}px,${ty+dy-25}px) rotate(65deg) scale(.25)`,opacity:0}],{duration:650,easing:'ease-out',fill:'none'});
  },{passive:true});
- // Touch bursts share the existing star layer and follow the selected design/code mode.
- let lastTouchBurst=0;
- window.addEventListener('pointerdown',e=>{
-  if(e.pointerType!=='touch'||reduced.matches)return;
-  const now=performance.now();if(now-lastTouchBurst<90)return;lastTouchBurst=now;
+ // On touch screens, mirror the quiet desktop trail rather than a radial burst.
+ let touchTrailTime=0,lastTouchX=-1000,lastTouchY=-1000;
+ const interactive='button, a, input, textarea, select, label, [role="button"], [data-lightbox]';
+ function touchTrail(e){
+  if(reduced.matches||e.pointerType!=='touch'||e.target.closest(interactive))return;
+  const now=performance.now(),x=e.clientX,y=e.clientY;
+  if(now-touchTrailTime<75||Math.hypot(x-lastTouchX,y-lastTouchY)<10)return;
+  touchTrailTime=now;lastTouchX=x;lastTouchY=y;
+  const star=sparks[starIndex++%sparks.length];
+  star.getAnimations().forEach(a=>a.cancel());
   const coding=document.body.dataset.area==='code';
-  const symbols=['</>','{ }','01','=>','();','[ ]'];
-  for(let i=0;i<7;i++){
-   const star=sparks[starIndex++%sparks.length];
-   star.getAnimations().forEach(a=>a.cancel());
-   star.classList.toggle('code-spark',coding);
-   star.textContent=coding?symbols[i%symbols.length]:'';
-   star.style.setProperty('--spark-size',(coding?12:13+i%3*4)+'px');
-   const angle=(i/7)*Math.PI*2+now*.001;
-   const dx=Math.cos(angle)*(28+i%3*9),dy=Math.sin(angle)*(28+i%3*9);
-   star.animate([
-    {transform:`translate(${e.clientX}px,${e.clientY}px) scale(.35) rotate(0deg)`,opacity:0},
-    {transform:`translate(${e.clientX+dx*.35}px,${e.clientY+dy*.35}px) scale(1) rotate(20deg)`,opacity:.95,offset:.25},
-    {transform:`translate(${e.clientX+dx}px,${e.clientY+dy-14}px) scale(.25) rotate(80deg)`,opacity:0}
-   ],{duration:650,easing:'ease-out',fill:'none'});
-  }
- },{passive:true});
+  star.classList.toggle('code-spark',coding);
+  star.textContent=coding?['</>','{ }','=>','();','[ ]','&&'][starIndex%6]:'';
+  star.style.setProperty('--spark-size',(coding?12:12+(starIndex%4)*5)+'px');
+  const dx=Math.sin(starIndex*2.4)*17,dy=Math.cos(starIndex*1.8)*14;
+  star.animate([
+   {transform:`translate(${x+dx}px,${y+dy}px) rotate(0deg) scale(.4)`,opacity:0},
+   {transform:`translate(${x+dx}px,${y+dy-4}px) rotate(15deg) scale(1)`,opacity:.85,offset:.22},
+   {transform:`translate(${x+dx*.65}px,${y+dy-25}px) rotate(65deg) scale(.25)`,opacity:0}
+  ],{duration:650,easing:'ease-out',fill:'none'});
+ }
+ window.addEventListener('pointerdown',touchTrail,{passive:true});
+ window.addEventListener('pointermove',e=>{if(e.buttons)touchTrail(e);},{passive:true});
  const hideCursor=()=>{sparks.forEach(s=>s.getAnimations().forEach(a=>a.cancel()));};
  document.documentElement.addEventListener('pointerleave',hideCursor);window.addEventListener('blur',hideCursor);reduced.addEventListener('change',hideCursor);
  rebuild();
